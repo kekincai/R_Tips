@@ -14,4 +14,4 @@
 **代码片段**
  1. [保存函数log文件](src/logging.r) 
 
-> 将函数中messaage、cat、print函数的结果保存到log文件。
+> 将函数中message、cat、print函数的结果保存到log文件。
