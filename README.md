@@ -9,3 +9,9 @@
 4. [dataframe获取首尾元素](doc/4.dataframe获取首尾元素.md) 
 5. [R语言多条件排序](doc/5.R语言多条件排序.md) 
 6. [多条件去重后单条件查重](doc/6.多条件去重后单条件查重.md) 
+
+---
+**代码片段**
+ 1. [保存函数log文件](src/logging.r) 
+
+> 将函数中messaage、cat、print函数的结果保存到log文件。
