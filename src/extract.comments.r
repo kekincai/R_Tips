@@ -1,7 +1,10 @@
 
-extract.comments <- function(source_file) {
+extract.comments <- function(fn) {
+    fn.chk <- tail(strsplit(fn,".",fixed = TRUE)[[1]], 1) %in% c("r", "R")
+    if(!fn.chk)
+        stop("输入文件类型错误")
     tmp_env <- new.env(parent=sys.frame())
-    source(source_file, tmp_env, echo=FALSE, print.eval=FALSE, verbose=FALSE, keep.source=TRUE)
+    source(fn, tmp_env, echo=FALSE, print.eval=FALSE, verbose=FALSE, keep.source=TRUE)
     funs <- Filter(is.function, sapply(ls(tmp_env), get, tmp_env))
 
     comments <- lapply(names(funs), function(nm) {
@@ -30,6 +33,6 @@ extract.comments <- function(source_file) {
         cat(comments[[i]], "\n")
     }    
 }
-if(FALSE) {
-    extract.comments("test.r")
+if(TRUE) {
+    extract.comments("test.c")
 }
