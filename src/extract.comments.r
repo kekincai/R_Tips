@@ -1,6 +1,6 @@
 
 extract.comments <- function(fn) {
-    fn.chk <- tail(strsplit(fn,".",fixed = TRUE)[[1]], 1) %in% c("r", "R")
+    fn.chk <- tail(strsplit(fn, ".", fixed=TRUE)[[1]], 1) %in% c("r", "R")
     if(!fn.chk)
         stop("输入文件类型错误")
     tmp_env <- new.env(parent=sys.frame())
