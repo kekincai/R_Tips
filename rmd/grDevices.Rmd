@@ -1,0 +1,246 @@
+---
+title: "grDevices"
+author: "kejincai"
+date: "9/10/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## adjustcolor
+Adjust or modify a vector of colors by “turning knobs” on one or more coordinates in (r,g,b,α) space, typically by up or down scaling them.
+
+```{r echo = TRUE}
+## Illustrative examples :
+opal <- palette("default")
+stopifnot(identical(adjustcolor(1:8,       0.75),
+                    adjustcolor(palette(), 0.75)))
+cbind(palette(), adjustcolor(1:8, 0.75))
+
+##  alpha = 1/2 * previous alpha --> opaque colors
+x <- palette(adjustcolor(palette(), 0.5))
+
+sines <- outer(1:20, 1:4, function(x, y) sin(x / 20 * pi * y))
+matplot(sines, type = "b", pch = 21:23, col = 2:5, bg = 2:5,
+        main = "Using an 'opaque ('translucent') color palette")
+
+x. <- adjustcolor(x, offset = c(0.5, 0.5, 0.5, 0), # <- "more white"
+                  transform = diag(c(.7, .7, .7, 0.6)))
+cbind(x, x.)
+op <- par(bg = adjustcolor("goldenrod", offset = -rep(.4, 4)), xpd = NA)
+plot(0:9, 0:9, type = "n", axes = FALSE, xlab = "", ylab = "",
+     main = "adjustcolor() -> translucent")
+text(1:8, labels = paste0(x,"++"), col = x., cex = 8)
+par(op)
+
+```
+
+## axisTicks
+Compute pretty axis scales and tick mark locations, the same way as traditional R graphics do it. This is interesting particularly for log scale axes.
+
+```{r echo = TRUE}
+require("graphics")
+plot(10*(0:10)); (pu <- par("usr"))
+aX <- function(side, at, ...)
+    axis(side, at = at, labels = FALSE, lwd.ticks = 2, col.ticks = 2,
+         tck = 0.05, ...)
+aX(1, print(xa <- axisTicks(pu[1:2], log = FALSE)))  # x axis
+aX(2, print(ya <- axisTicks(pu[3:4], log = FALSE)))  # y axis
+
+axisTicks(pu[3:4], log = FALSE, nint = 10)
+
+plot(10*(0:10), log = "y"); (pu <- par("usr"))
+aX(2, print(ya <- axisTicks(pu[3:4], log = TRUE)))  # y axis
+
+plot(2^(0:9), log = "y"); (pu <- par("usr"))
+aX(2, print(ya <- axisTicks(pu[3:4], log = TRUE)))  # y axis
+```
+
+## plotmath
+If the text argument to one of the text-drawing functions (text, mtext, axis, legend) in R is an expression, the argument is interpreted as a mathematical expression and the output will be formatted according to TeX-like rules. Expressions can also be used for titles, subtitles and x- and y-axis labels (but not for axis labels on persp plots).
+
+```{r echo = TRUE}
+require(graphics)
+
+x <- seq(-4, 4, length.out = 101)
+y <- cbind(sin(x), cos(x))
+matplot(x, y, type = "l", xaxt = "n",
+        main = expression(paste(plain(sin) * phi, "  and  ",
+                                plain(cos) * phi)),
+        ylab = expression("sin" * phi, "cos" * phi), # only 1st is taken
+        xlab = expression(paste("Phase Angle ", phi)),
+        col.main = "blue")
+axis(1, at = c(-pi, -pi/2, 0, pi/2, pi),
+     labels = expression(-pi, -pi/2, 0, pi/2, pi))
+
+
+## How to combine "math" and numeric variables :
+plot(1:10, type="n", xlab="", ylab="", main = "plot math & numbers")
+theta <- 1.23 ; mtext(bquote(hat(theta) == .(theta)), line= .25)
+for(i in 2:9)
+    text(i, i+1, substitute(list(xi, eta) == group("(",list(x,y),")"),
+                            list(x = i, y = i+1)))
+## note that both of these use calls rather than expressions.
+##
+text(1, 10,  "Derivatives:", adj = 0)
+text(1, 9.6, expression(
+ "             first: {f * minute}(x) " == {f * minute}(x)), adj = 0)
+text(1, 9.0, expression(
+ "     second: {f * second}(x) "        == {f * second}(x)), adj = 0)
+
+
+plot(1:10, 1:10)
+text(4, 9, expression(hat(beta) == (X^t * X)^{-1} * X^t * y))
+text(4, 8.4, "expression(hat(beta) == (X^t * X)^{-1} * X^t * y)",
+     cex = .8)
+text(4, 7, expression(bar(x) == sum(frac(x[i], n), i==1, n)))
+text(4, 6.4, "expression(bar(x) == sum(frac(x[i], n), i==1, n))",
+     cex = .8)
+text(8, 5, expression(paste(frac(1, sigma*sqrt(2*pi)), " ",
+                            plain(e)^{frac(-(x-mu)^2, 2*sigma^2)})),
+     cex = 1.2)
+
+## some other useful symbols
+plot.new(); plot.window(c(0,4), c(15,1))
+text(1, 1, "universal", adj = 0); text(2.5, 1,  "\\042")
+text(3, 1, expression(symbol("\042")))
+text(1, 2, "existential", adj = 0); text(2.5, 2,  "\\044")
+text(3, 2, expression(symbol("\044")))
+text(1, 3, "suchthat", adj = 0); text(2.5, 3,  "\\047")
+text(3, 3, expression(symbol("\047")))
+text(1, 4, "therefore", adj = 0); text(2.5, 4,  "\\134")
+text(3, 4, expression(symbol("\134")))
+text(1, 5, "perpendicular", adj = 0); text(2.5, 5,  "\\136")
+text(3, 5, expression(symbol("\136")))
+text(1, 6, "circlemultiply", adj = 0); text(2.5, 6,  "\\304")
+text(3, 6, expression(symbol("\304")))
+text(1, 7, "circleplus", adj = 0); text(2.5, 7,  "\\305")
+text(3, 7, expression(symbol("\305")))
+text(1, 8, "emptyset", adj = 0); text(2.5, 8,  "\\306")
+text(3, 8, expression(symbol("\306")))
+text(1, 9, "angle", adj = 0); text(2.5, 9,  "\\320")
+text(3, 9, expression(symbol("\320")))
+text(1, 10, "leftangle", adj = 0); text(2.5, 10,  "\\341")
+text(3, 10, expression(symbol("\341")))
+text(1, 11, "rightangle", adj = 0); text(2.5, 11,  "\\361")
+text(3, 11, expression(symbol("\361")))
+```
+
+## densCols
+densCols produces a vector containing colors which encode the local densities at each point in a scatterplot.
+
+```{r echo = TRUE}
+x1  <- matrix(rnorm(1e3), ncol = 2)
+x2  <- matrix(rnorm(1e3, mean = 3, sd = 1.5), ncol = 2)
+x   <- rbind(x1, x2)
+
+dcols <- densCols(x)
+graphics::plot(x, col = dcols, pch = 20, main = "n = 1000")
+```
+
+## colors
+Returns the built-in color names which R knows about.
+```{r echo = TRUE}
+col <- colors()
+head(col, 50)
+demo("colors")
+```
+## Japanese
+Returns the built-in color names which R knows about.
+```{r echo = TRUE}
+require(graphics)
+
+plot(1:9, type = "n", axes = FALSE, frame.plot = TRUE, ylab = "",
+     main = "example(Japanese)", xlab = "using Hershey fonts")
+par(cex = 3)
+Vf <- c("serif", "plain")
+
+text(4, 2, "\\#J244b\\#J245b\\#J2473", vfont = Vf)
+text(4, 4, "\\#J2538\\#J2563\\#J2551\\#J2573", vfont = Vf)
+text(4, 6, "\\#J467c\\#J4b5c", vfont = Vf)
+text(4, 8, "Japan", vfont = Vf)
+par(cex = 1)
+text(8, 2, "Hiragana")
+text(8, 4, "Katakana")
+text(8, 6, "Kanji")
+text(8, 8, "English")
+```
+
+## Palettes
+Create a vector of n contiguous colors.
+```{r echo = TRUE}
+require("graphics")
+
+# color wheels in RGB/HSV and HCL space
+par(mfrow = c(2, 2))
+pie(rep(1, 12), col = rainbow(12), main = "RGB/HSV")
+pie(rep(1, 12), col = hcl.colors(12, "Set 2"), main = "HCL")
+par(mfrow = c(1, 1))
+
+## color swatches for RGB/HSV palettes
+demo.pal <-
+  function(n, border = if (n < 32) "light gray" else NA,
+           main = paste("color palettes;  n=", n),
+           ch.col = c("rainbow(n, start=.7, end=.1)", "heat.colors(n)",
+                      "terrain.colors(n)", "topo.colors(n)",
+                      "cm.colors(n)"))
+{
+    nt <- length(ch.col)
+    i <- 1:n; j <- n / nt; d <- j/6; dy <- 2*d
+    plot(i, i+d, type = "n", yaxt = "n", ylab = "", main = main)
+    for (k in 1:nt) {
+        rect(i-.5, (k-1)*j+ dy, i+.4, k*j,
+             col = eval(str2lang(ch.col[k])), border = border)
+        text(2*j,  k * j + dy/4, ch.col[k])
+    }
+}
+demo.pal(16)
+
+## color swatches for HCL palettes
+hcl.swatch <- function(type = NULL, n = 5, nrow = 11,
+  border = if (n < 15) "black" else NA) {
+    palette <- hcl.pals(type)
+    cols <- sapply(palette, hcl.colors, n = n)
+    ncol <- ncol(cols)
+    nswatch <- min(ncol, nrow)
+
+    par(mar = rep(0.1, 4),
+        mfrow = c(1, min(5, ceiling(ncol/nrow))),
+        pin = c(1, 0.5 * nswatch),
+        cex = 0.7)
+
+    while (length(palette)) {
+        subset <- 1:min(nrow, ncol(cols))
+        plot.new()
+        plot.window(c(0, n), c(0, nrow + 1))
+        text(0, rev(subset) + 0.1, palette[subset], adj = c(0, 0))
+        y <- rep(subset, each = n)
+        rect(rep(0:(n-1), n), rev(y), rep(1:n, n), rev(y) - 0.5,
+             col = cols[, subset], border = border)
+        palette <- palette[-subset]
+        cols <- cols[, -subset, drop = FALSE]
+    }
+
+    par(mfrow = c(1, 1), mar = c(5.1, 4.1, 4.1, 2.1), cex = 1)
+}
+# hcl.swatch()
+# hcl.swatch("qualitative")
+# hcl.swatch("sequential")
+# hcl.swatch("diverging")
+# hcl.swatch("divergingx")
+
+## heat maps with sequential HCL palette (purple)
+image(volcano, col = hcl.colors(11, "purples", rev = TRUE))
+filled.contour(volcano, nlevels = 10,
+               color.palette = function(n, ...)
+                   hcl.colors(n, "purples", rev = TRUE, ...))
+
+## list available HCL color palettes
+hcl.pals("qualitative")
+hcl.pals("sequential")
+hcl.pals("diverging")
+hcl.pals("divergingx")
+```
+
